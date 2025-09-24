@@ -1,103 +1,141 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  PlusCircle,
+  Briefcase,
+  Calendar,
+  FileText,
+  CheckCircle,
+} from "lucide-react";
+
+
+interface Job {
+  id: number;
+  company: string;
+  position: string;
+  location: string;
+  jobType: string;
+  status: "Pending" | "Interview" | "Declined" | "Accepted";
+  date: string;
+  description: string;
+  link: string;
+}
+
+export default function HomePage() {
+  const [jobs] = useLocalStorage<Job[]>("jobs", []);
+
+  const pendingCount = jobs.filter((j) => j.status === "Pending").length;
+  const interviewCount = jobs.filter((j) => j.status === "Interview").length;
+  const declinedCount = jobs.filter((j) => j.status === "Declined").length;
+  const acceptedCount = jobs.filter((j) => j.status === "Accepted").length;
+
+  const recentJobs = [...jobs]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 2);
+
+
+  const upcomingInterviews = [...jobs]
+    .filter((j) => j.status === "Interview")
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 2);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="space-y-8 p-4 md:p-6">
+      <section className="flex items-center justify-between bg-indigo-50 rounded-xl p-6 shadow-md">
+        <div>
+          <h1 className="text-2xl font-bold text-indigo-800">Welcome</h1>
+          <p className="text-sm text-indigo-600">
+            Track and manage your job applications easily
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <Button className="bg-indigo-600 text-white hover:bg-indigo-700 flex items-center">
+          <PlusCircle className="w-4 h-4 mr-1" /> Add Job
+        </Button>
+      </section>
+
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-yellow-50 rounded-xl p-4 shadow-sm text-center">
+          <Briefcase className="w-6 h-6 mb-1 text-yellow-500 mx-auto" />
+          <div className="text-2xl font-bold text-yellow-600">
+            {pendingCount}
+          </div>
+          <span className="text-yellow-700 text-sm">Pending</span>
+        </Card>
+        <Card className="bg-blue-50 rounded-xl p-4 shadow-sm text-center">
+          <Calendar className="w-6 h-6 mb-1 text-blue-500 mx-auto" />
+          <div className="text-2xl font-bold text-blue-600">
+            {interviewCount}
+          </div>
+          <span className="text-blue-700 text-sm">Interviews</span>
+        </Card>
+        <Card className="bg-red-50 rounded-xl p-4 shadow-sm text-center">
+          <FileText className="w-6 h-6 mb-1 text-red-500 mx-auto" />
+          <div className="text-2xl font-bold text-red-600">{declinedCount}</div>
+          <span className="text-red-700 text-sm">Declined</span>
+        </Card>
+        <Card className="bg-green-50 rounded-xl p-4 shadow-sm text-center">
+          <CheckCircle className="w-6 h-6 mb-1 text-green-500 mx-auto" />
+          <div className="text-2xl font-bold text-green-600">
+            {acceptedCount}
+          </div>
+          <span className="text-green-700 text-sm">Accepted</span>
+        </Card>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-700">
+          Recent Applications
+        </h2>
+        {recentJobs.length > 0 ? (
+          recentJobs.map((job) => (
+            <Card
+              key={job.id}
+              className="bg-purple-50 rounded-xl shadow-sm hover:bg-purple-100 transition-colors"
+            >
+              <CardContent className="p-4">
+                <p className="font-medium text-purple-800">{job.position}</p>
+                <p className="text-sm text-purple-600">
+                  {job.company} · {job.status}
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">No applications yet.</p>
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-700">
+          Upcoming Interviews
+        </h2>
+        {upcomingInterviews.length > 0 ? (
+          upcomingInterviews.map((job) => (
+            <Card
+              key={job.id}
+              className="bg-blue-50 rounded-xl shadow-sm hover:bg-blue-100 transition-colors"
+            >
+              <CardContent className="p-4">
+                <p className="font-medium text-blue-800">{job.company}</p>
+                <p className="text-sm text-blue-600">
+                  {job.position} ·{" "}
+                  {new Date(job.date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  })}
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">No upcoming interviews.</p>
+        )}
+      </section>
     </div>
   );
 }
