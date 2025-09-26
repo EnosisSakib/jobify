@@ -4,6 +4,8 @@ import { Job, JobType, JobStatus } from "../utility";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 
 export default function JobListPage() {
   const [search, setSearch] = useState<string>("");
@@ -107,11 +109,12 @@ export default function JobListPage() {
         </div>
       </div>
 
-     <Link href="/jobs/add">
-  <button className="mb-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-    Add Job
-  </button>
-</Link>
+      <Link href="/jobs/add">
+        <Button className="bg-indigo-600 text-white hover:bg-indigo-700 flex items-center">
+          <PlusCircle className="w-4 h-4 mr-1" /> Add Job
+        </Button>
+      </Link>
+      <br></br>
       <div className="grid gap-6 md:grid-cols-4">
         {paginatedJobs.map((job) => (
           <div

@@ -10,7 +10,7 @@ import {
   FileText,
   CheckCircle,
 } from "lucide-react";
-
+import Link from "next/link";
 
 interface Job {
   id: number;
@@ -36,7 +36,6 @@ export default function HomePage() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 2);
 
-
   const upcomingInterviews = [...jobs]
     .filter((j) => j.status === "Interview")
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -51,9 +50,11 @@ export default function HomePage() {
             Track and manage your job applications easily
           </p>
         </div>
-        <Button className="bg-indigo-600 text-white hover:bg-indigo-700 flex items-center">
-          <PlusCircle className="w-4 h-4 mr-1" /> Add Job
-        </Button>
+        <Link href="/jobs/add">
+          <Button className="bg-indigo-600 text-white hover:bg-indigo-700 flex items-center">
+            <PlusCircle className="w-4 h-4 mr-1" /> Add Job
+          </Button>
+        </Link>
       </section>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
